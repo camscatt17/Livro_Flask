@@ -13,6 +13,7 @@ class DevelopmentConfig(Config):
     IP_HOST = 'localhost'
     PORT_HOST = 8000
     URL_MAIN = 'http://%s:%s/' % (IP_HOST, PORT_HOST)
+    #f'http://{IP_HOST}:{PORT_HOST}/'
 
 class TestingConfig(Config):
     TESTING = True
@@ -34,4 +35,5 @@ app_config = {
     'production': ProductionConfig()
 }
 
-app_active = os.getenv('FLASK_ENV')
+FLASK_ENV = "development"
+app_active = os.environ.get('FLASK_ENV',FLASK_ENV)
