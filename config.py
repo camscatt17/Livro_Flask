@@ -37,4 +37,4 @@ app_config = {
 }
 
 FLASK_ENV = "development"
-app_active = os.environ.get('FLASK_ENV',FLASK_ENV)
+app_active = os.environ.get('FLASK_ENV', FLASK_ENV) 

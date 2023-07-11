@@ -1,3 +1,5 @@
+# O arquivo app.py é responsável por conter a inicialização das propriedades da ferramenta Flask, banco de dados e, além disso, as rotas do projeto
+
 # -*- coding: utf-8 -*-
 from flask import Flask
 
@@ -5,6 +7,7 @@ from flask import Flask
 from config import app_config, app_active
 
 config = app_config[app_active]
+
 def create_app(config_name):
     app = Flask(__name__, template_folder='templates')
 
