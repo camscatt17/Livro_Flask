@@ -1,12 +1,21 @@
 import os
-import random, string
+from sqlalchemy import URL
+
+database_url = URL.create(
+    "mysql+mysqldb",
+    username="root",
+    password="Proxed64#",
+    host="127.0.0.1",
+    port="3306", 
+    database="aprendizado",
+)
 
 class Config(object):
     CSRF_ENABLED = True
     SECRET = 'ysb_92=qe#dgjf8%0ng+a*#4rt#5%3*4kw5%i2bck*gn@w3@f&-&'
     TEMPLATE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:Proxed64#@127.0.0.1:3306/aprendizado'
+    SQLALCHEMY_DATABASE_URI = database_url
     APP = None
 
 class DevelopmentConfig(Config):

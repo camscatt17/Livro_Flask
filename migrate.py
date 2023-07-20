@@ -8,49 +8,88 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from config import app_active, app_config
 
-config = app_config[app_active]
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Text, DateTime, Boolean, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+config = app_config[app_active]
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
+
 migrate = Migrate(app, db)
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-class Role(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), unique=True, nullable=False)
+class Base(DeclarativeBase):
+    pass
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(40), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password=db.Column(db.String(80), nullable=False)
-    date_created=db.Column(db.DateTime(6), default=db.func.current_timestamp(), nullable=False)
-    last_update=db.Column(db.DateTime(6), onupdate=db.func.current_timestamp(), nullable=True)
-    recovery_code=db.Column(db.Boolean(), default=1, nullable=True)
-    role = db.Column(db.Integer, db.ForeignKey(Role.id), nullable=False)
+class Category(Base):
+    __tablename__ = 'categoria'
 
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), unique=True, nullable=False)
-    description = db.Column(db.Text(), nullable=False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), unique=True, nullable=False)
+    description = Column(Text, nullable=False)
 
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), unique=True, nullable=False)
-    description = db.Column(db.Text(), nullable=False)
-    qtd = db.Column(db.Integer, nullable=True, default=0)
-    image = db.Column(db.Text(), nullable=True)
-    price = db.Column(db.Numeric(10,2), nullable=False)
-    date_created = db.Column(db.DateTime(6), default=db.func.current_timestamp(), nullable=False)
-    last_update = db.Column(db.DateTime(6), onupdate=db.func.current_timestamp(), nullable=False)
-    status = db.Column(db.Integer, default=1, nullable=True)
-    user_created = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    category = db.Column(db.Integer, db.ForeignKey(Category.id), nullable=False)
+    def __repr__(self):
+        return f'<Categoria(id={self.id}, nome={self.name}, descricao={self.description})>'
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+class Product(Base):
+    __tablename__ = 'produto'
 
+    id = Column(Integer, primary_key=True)
+    name = Column(String(20), unique=True, nullable=False)
+    description = Column(String(500), nullable=False)
+    qtd = Column(Integer, nullable=True, default=0)
+    image = Column(Text, nullable=True)
+    price = Column(Float, nullable=False)
+    date_created = Column(DateTime(6), server_default=func.current_timestamp(), nullable=False)
+    last_update = Column(DateTime(6), onupdate=func.current_timestamp(), nullable=False)
+    status = Column(Integer, default=1, nullable=True)
+    user_created: Mapped[int] = mapped_column(ForeignKey("usuario.id"), nullable=False)
+    category: Mapped[int] = mapped_column(ForeignKey("categoria.id"), nullable=False)
+
+    def __repr__(self):
+        return f'<Produto(id={self.id}, nome={self.name}, descricao={self.description}, quantidade={self.qtd}, image={self.image}, preco={self.price}, data_created={self.date_created}, last_update={self.last_update}, status={self.status}, user_created={self.user_created}, category={self.category})>'
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class Role(Base):
+    __tablename__ = 'role'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(40), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Role(id={self.id}, nome={self.name})>'
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+class User(Base):
+    __tablename__ = 'usuario'
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(40), unique=True, nullable=False)
+    email = Column(String(120), unique=True, nullable=False)
+    password = Column(String(80), nullable=False)
+    date_created = Column(DateTime(6), server_default=func.current_timestamp(), nullable=False)
+    last_update = Column(DateTime(6), onupdate=func.current_timestamp(), nullable=True)
+    recovery_code = Column(Boolean, default=1, nullable=True)
+    role: Mapped[int] = mapped_column(ForeignKey("role.id"), nullable=False)
+
+    def __repr__(self):
+        return f'<Usuario(id={self.id}, username={self.username}, email={self.email}, password={self.password}, data_created={self.date_created}, last_update={self.last_update}, recovery_code={self.recovery_code}, role={self.role})>'
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
 if __name__ == '__main__':
-    manager.run()
+    manager.run() 
+
