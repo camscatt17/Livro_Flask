@@ -7,7 +7,7 @@ database_url = URL.create(
     password="Proxed64#",
     host="127.0.0.1",
     port="3306", 
-    database="aprendizado",
+    database="livro_flask",
 )
 
 class Config(object):

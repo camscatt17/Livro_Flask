@@ -13,7 +13,6 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 config = app_config[app_active]
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -22,6 +21,7 @@ migrate = Migrate(app, db)
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+
 
 class Base(DeclarativeBase):
     pass

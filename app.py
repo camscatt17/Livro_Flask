@@ -30,8 +30,8 @@ def create_app(config_name):
         return 'Hello World!'
     
     ########################################################################
-    @app.route('/createTables/')
-    def createTables():
+    @app.route('/criarTabelas/')
+    def criarTabelas():
         createTables(engine=db.engine, session=db.session)
         return "Tabelas criadas!"
     
