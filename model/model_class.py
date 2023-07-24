@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Text, DateTime, Boolean, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from passlib.hash import pbkdf2_sha256 
+
 class Base(DeclarativeBase):
     pass
 
@@ -67,6 +69,37 @@ class User(Base):
     
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}    
+
+class QueriesUser():
+    @staticmethod
+    def get_user_by_mail(self):
+        """_summary_
+        """
+        return ''
+    
+    @staticmethod
+    def get_user_by_id(self):
+        """_summary_
+        """
+        return ''
+    
+    @staticmethod
+    def hash_password(self, password):
+        try:
+            return pbkdf2_sha256.hash(password)
+        except Exception as e:
+            print("Erro ao criptografar senha %s" %e)
+            
+    @staticmethod
+    def set_password(self, password):
+        self.password = pbkdf2_sha256.hash(password)
+        
+    @staticmethod
+    def verify_password(self, password_no_hash, password_database):
+        try:
+            return pbkdf2_sha256.verify(password_no_hash, password_database)
+        except ValueError:
+            return False
 
 def createTables(engine, session=None):
     Base.metadata.create_all(engine, checkfirst=True)
