@@ -14,6 +14,9 @@ from model.model_class import createTables
 # Controllers
 from controller.User import UserController
 
+# Admin
+from admin.Admin import start_views
+
 config = app_config[app_active]
 
 def create_app(config_name):
@@ -27,6 +30,7 @@ def create_app(config_name):
     app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db = SQLAlchemy(config.APP, engine_options={"echo":True})
+    start_views(app, db)
     db.init_app(app)
 
     # Será dentro da def de uma rota que acionaremos a controller para realizar as ações necessárias dessa rota
