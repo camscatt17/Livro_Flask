@@ -3,13 +3,16 @@
 
 # -*- coding: utf-8 -*-
 from flask import Flask
-from flask import request
+from flask import request, redirect, render_template
 from flask_cors import CORS
 
 # config import
 from config import app_config, app_active
 from flask_sqlalchemy import SQLAlchemy
 from model.model_class import createTables
+
+# Controllers
+from controller.User import UserController
 
 config = app_config[app_active]
 
@@ -41,7 +44,22 @@ def create_app(config_name):
     ##########################################################################################################
     @app.route('/login/')
     def login():
-        return "Aqui entrará a tela de login"
+        return "Aqui entrará a tela de login!"
+    
+    ##########################################################################################################
+    @app.route('/login/', methods=['POST'])
+    def loginPost():
+        user = UserController()
+        
+        email = request.form['email']
+        password = request.form['password']
+        
+        result = user.login(email, password)
+        
+        if result:
+            return redirect('/admin')
+        else:
+            return render_template('logn.html', data={'status':401, 'msg':'Dados de usuário incorretos', 'type': None})
     
     ##########################################################################################################
     @app.route('/recuperarSenha/')
@@ -49,29 +67,20 @@ def create_app(config_name):
         return "Aqui entrará a tela de recuperar senha"
     
     ##########################################################################################################
+    @app.route('/recuperarSenha/', methods=['POST'])
+    def sendRecuperarSenha():
+        user = UserController()
+        
+        result = user.recorvery(request.form['email'])
+        
+        if result:
+            return render_template('recovery.html', data={'status':200, 'msg':'E-mail de recuperação enviado com sucesso!'})
+        else:
+            return render_template('recovey.html', data={'status': 401, 'msg':'Erro ao enviar e-mail de recuperaçã'})
+            
+    ##########################################################################################################
     @app.route('/profile/<int:id>/action/<action>/')
     def profile(id):
-        if action == 'action1':
-            return 'Ação action1 usuário de ID %d' %id
-        elif action == 'action2':
-            return 'Ação action2 usuário de ID %d' %id
-        elif action == 'action3':
-            return 'Ação action3 usuário de ID %d' %id
-        
-    ##########################################################################################################
-    @app.route('/profile', methods=['POST'])
-    def createProfile():
-        username = request.form['username']
-        password = request.form['password']
-        
-        return 'Essa rota possui um método POST e criará um usuário com os dados de usuários %s e senha %s' %(username, password)
-    
-    ##########################################################################################################
-    @app.route('/profile/<int:id>', methods=['PUT'])
-    def editTotalProfile(id):
-        username = request.form['username']
-        password = request.form['password']
-        
-        return 'Essa rota possui um método PUT e editará o nome do usuário para %s e a senha %s' %(username, password)
+       pass
             
     return app
