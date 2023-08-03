@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Text, DateTime, Boolean, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+from config import app_active, app_config
+
 from passlib.hash import pbkdf2_sha256 
 
 class Base(DeclarativeBase):
@@ -13,8 +15,11 @@ class Category(Base):
     name = Column(String(255), unique=True, nullable=False)
     description = Column(Text, nullable=False)
 
+    # def __repr__(self):
+    #     return f'<Categoria(id={self.id}, nome={self.name}, descricao={self.description})>'
+    
     def __repr__(self):
-        return f'<Categoria(id={self.id}, nome={self.name}, descricao={self.description})>'
+        return self.name
     
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -25,9 +30,12 @@ class Role(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(40), unique=True, nullable=False)
 
-    def __repr__(self):
-        return f'<Role(id={self.id}, nome={self.name})>'
+    # def __repr__(self):
+    #     return f'<Role(id={self.id}, nome={self.name})>'
 
+    def __repr__(self):
+        return self.name
+    
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -42,10 +50,13 @@ class User(Base):
     last_update = Column(DateTime(6), onupdate=func.current_timestamp(), nullable=True)
     recovery_code = Column(Boolean, default=1, nullable=True)
     role: Mapped[int] = mapped_column(ForeignKey("role.id"), nullable=False)
-    funcao=relationship(Role)
+    funcao = relationship(Role)
 
+    # def __repr__(self):
+    #     return f'<Usuario(id={self.id}, username={self.username}, email={self.email}, password={self.password}, data_created={self.date_created}, last_update={self.last_update}, recovery_code={self.recovery_code}, role={self.role})>'
+    
     def __repr__(self):
-        return f'<Usuario(id={self.id}, username={self.username}, email={self.email}, password={self.password}, data_created={self.date_created}, last_update={self.last_update}, recovery_code={self.recovery_code}, role={self.role})>'
+        return '%s - %s' % (self.id, self.username);
     
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}   
@@ -65,8 +76,8 @@ class Product(Base):
     status = Column(Integer, default=1, nullable=True)
     user_created: Mapped[int] = mapped_column(ForeignKey("usuario.id"), nullable=False)
     category: Mapped[int] = mapped_column(ForeignKey("categoria.id"), nullable=False)
-    usuario=relationship(User)
-    categoria=relationship(Category)
+    usuario = relationship(User)
+    categoria = relationship(Category)
 
     def __repr__(self):
         return f'<Produto(id={self.id}, nome={self.name}, descricao={self.description}, quantidade={self.qtd}, image={self.image}, preco={self.price}, data_created={self.date_created}, last_update={self.last_update}, status={self.status}, user_created={self.user_created}, category={self.category})>'
